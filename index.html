@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOTC Basketball Math Tournament</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header .basketball {
+            font-size: 3em;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+        }
+
+        .btn-secondary:hover {
+            background: #38a169;
+        }
+
+        .btn-danger {
+            background: #f56565;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+
+        .team-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .team-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .team-card:hover {
+            transform: scale(1.05);
+        }
+
+        .team-card.selected {
+            border: 4px solid #ffd700;
+            box-shadow: 0 0 20px #ffd700;
+        }
+
+        .team-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .team-card .members {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .station-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .station-btn {
+            padding: 20px;
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .station-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .station-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .station-btn h3 {
+            margin-bottom: 10px;
+        }
+
+        .problem-container {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .problem {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+        }
+
+        .problem h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .rookie { background: #48bb78; color: white; }
+        .allstar { background: #f6ad55; color: white; }
+        .mvp { background: #f56565; color: white; }
+
+        .answer-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .scoreboard {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .scoreboard h2 {
+            margin-bottom: 15px;
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .timer {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            background: #f56565;
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #48bb78;
+        }
+
+        .feedback.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #f56565;
+        }
+
+        .celebration {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .celebration .trophy {
+            font-size: 5em;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .work-shown {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+
+        .help-box {
+            background: #bee3f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #3182ce;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #667eea;
+        }
+
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-card .label {
+            font-size: 0.9em;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .firebase-setup {
+            background: #fef5e7;
+            border: 2px solid #f39c12;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .firebase-setup h3 {
+            color: #e67e22;
+            margin-bottom: 10px;
+        }
+
+        .firebase-setup code {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            display: block;
+            margin: 10px 0;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+
+        .connection-status.connected {
+            background: #48bb78;
+            color: white;
+        }
+
+        .connection-status.disconnected {
+            background: #f56565;
+            color: white;
+        }
+
+        .live-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #48bb78;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            margin-right: 5px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status" id="connectionStatus">
+        <span class="live-indicator"></span>
+        Connecting...
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="basketball">🏀</div>
+            <h1>SOTC Basketball Math Tournament</h1>
+            <p>Compete, Collaborate, Conquer Math!</p>
+        </div>
+
+        <!-- Welcome Screen -->
+        <div id="welcome" class="screen active">
+            <div class="card">
+                <h2 style="margin-bottom: 20px;">Welcome to the Math Tournament!</h2>
+                <p style="margin-bottom: 20px; font-size: 1.1em;">
+                    <span class="live-indicator"></span>
+                    <strong>LIVE MULTIPLAYER MODE</strong> - All students can see each other's teams in real-time!
+                </p>
+                <button class="btn" onclick="showScreen('teamSetup')">Create/Join Team</button>
+                <button class="btn btn-secondary" onclick="showScreen('teacherView')" style="margin-left: 10px;">Teacher View</button>
+            </div>
+        </div>
+
+        <!-- Team Setup Screen -->
+        <div id="teamSetup" class="screen">
+            <div class="card">
+                <h2 style="margin-bottom: 20px;">Team Setup</h2>
+                
+                <div style="margin-bottom: 30px;">
+                    <h3>Create New Team</h3>
+                    <input type="text" id="newTeamName" placeholder="Team Name (e.g., Lakers, Warriors)">
+                    <input type="text" id="studentName" placeholder="Your Name">
+                    <input type="text" id="grade" placeholder="Grade (6, 7, or 8)">
+                    <button class="btn" onclick="createTeam()">Create Team</button>
+                </div>
+
+                <div>
+                    <h3>Join Existing Team <span class="live-indicator"></span></h3>
+                    <div id="teamList" class="team-list"></div>
+                </div>
+
+                <button class="btn btn-secondary" onclick="startTournament()" style="margin-top: 20px;">
+                    Start Tournament
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game" class="screen">
+            <div class="scoreboard">
+                <h2>🏀 Scoreboard <span class="live-indicator"></span></h2>
+                <div id="scoreboardContent"></div>
+            </div>
+
+            <div class="timer" id="timer">Time: 10:00</div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px;">Select Your Station</h2>
+                <div class="station-selector" id="stationSelector"></div>
+            </div>
+
+            <div id="stationContent"></div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results" class="screen">
+            <div class="card celebration">
+                <div class="trophy">🏆</div>
+                <h1 style="margin: 20px 0;">Tournament Complete!</h1>
+                <div id="finalResults"></div>
+                <button class="btn" onclick="resetForNewRound()" style="margin-top: 30px;">
+                    Start New Round
+                </button>
+            </div>
+        </div>
+
+        <!-- Teacher View -->
+        <div id="teacherView" class="screen">
+            <div class="card">
+                <h2 style="margin-bottom: 20px;">Teacher Dashboard <span class="live-indicator"></span></h2>
+                <div class="stats-grid" id="teacherStats"></div>
+                <div id="teacherTeamList"></div>
+                <button class="btn btn-danger" onclick="resetTournament()">Reset Tournament</button>
+                <button class="btn" onclick="showScreen('welcome')" style="margin-left: 10px;">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAd_5VEot_kEMzM2mlWB3XoW2TPyR8G3N8",
+            authDomain: "sotc-math-competition.firebaseapp.com",
+            databaseURL: "https://sotc-math-competition-default-rtdb.firebaseio.com",
+            projectId: "sotc-math-competition",
+            storageBucket: "sotc-math-competition.firebasestorage.app",
+            messagingSenderId: "985967835286",
+            appId: "1:985967835286:web:f3bc5fe7b2eab15a8c2ab7",
+            measurementId: "G-M39EWJVCKS"
+        };
+
+        // Game State
+        let db = null;
+        let currentTeamId = null;
+        let currentStudentName = null;
+        let teamsRef = null;
+        let connected = false;
+
+        const STATION_DATA = {
+            freeThrow: {
+                name: "Free Throw Line",
+                subtitle: "Proportions & Percentages",
+                icon: "🎯",
+                problems: [
+                    {
+                        id: 1,
+                        difficulty: "rookie",
+                        points: 1,
+                        question: "A player makes 15 out of 20 free throws. What percentage is this?",
+                        answer: "75",
+                        hint: "Divide 15 by 20, then multiply by 100"
+                    },
+                    {
+                        id: 2,
+                        difficulty: "rookie",
+                        points: 1,
+                        question: "If a player makes 3 out of every 5 attempts, how many would they make in 25 attempts?",
+                        answer: "15",
+                        hint: "Set up a proportion: 3/5 = x/25"
+                    },
+                    {
+                        id: 3,
+                        difficulty: "allstar",
+                        points: 2,
+                        question: "A player has made 68 of 85 free throw attempts. What is their percentage to the nearest whole number?",
+                        answer: "80",
+                        hint: "68 ÷ 85 = ? Then round to nearest whole number"
+                    },
+                    {
+                        id: 4,
+                        difficulty: "mvp",
+                        points: 3,
+                        question: "A player's free throw percentage is 82%. They need to reach 85% by the end of the season. If they've taken 150 attempts so far, how many consecutive makes do they need?",
+                        answer: "15",
+                        hint: "Current makes: 0.82 × 150 = 123. Set up equation: (123 + x)/(150 + x) = 0.85"
+                    }
+                ]
+            },
+            threePoint: {
+                name: "Three-Point Arc",
+                subtitle: "Expressions & Equations",
+                icon: "🎪",
+                problems: [
+                    {
+                        id: 1,
+                        difficulty: "rookie",
+                        points: 1,
+                        question: "Simplify: 4(x + 3) - 2",
+                        answer: "4x+10",
+                        hint: "Distribute the 4, then combine like terms"
+                    },
+                    {
+                        id: 2,
+                        difficulty: "rookie",
+                        points: 1,
+                        question: "Solve: 2x + 5 = 13",
+                        answer: "4",
+                        hint: "Subtract 5 from both sides, then divide by 2"
+                    },
+                    {
+                        id: 3,
+                        difficulty: "allstar",
+                        points: 2,
+                        question: "Simplify: 3(x + 2) - 1",
+                        answer: "3x+5",
+                        hint: "THIS IS THE 6TH GRADE KILLER! Distribute first, then combine"
+                    },
+                    {
+                        id: 4,
+                        difficulty: "mvp",
+                        points: 3,
+                        question: "Solve: 3(x - 4) = 2x + 5",
+                        answer: "17",
+                        hint: "Distribute, move x terms to one side, then solve"
+                    }
+                ]
+            },
+            paint: {
+                name: "Paint/Key",
+                subtitle: "Sum vs. Average",
+                icon: "📊",
+                problems: [
+                    {
+                        id: 1,
+                        difficulty: "rookie",
+                        points: 1,
+                        question: "A player scored: 18, 22, 20, 25, 20 points. What is the SUM?",
+                        answer: "105",
+                        hint: "Add all numbers together"
+                    },
+                    {
+                        id: 2,
+                        difficulty: "rookie",
+                        points: 1,
+                        question: "Using the same scores (18, 22, 20, 25, 20), what is the AVERAGE?",
+                        answer: "21",
+                        hint: "Sum ÷ number of games"
+                    },
+                    {
+                        id: 3,
+                        difficulty: "allstar",
+                        points: 2,
+                        question: "A player averages 22 points per game over 8 games. What is the TOTAL (sum)?",
+                        answer: "176",
+                        hint: "Average × number of games = total"
+                    },
+                    {
+                        id: 4,
+                        difficulty: "mvp",
+                        points: 3,
+                        question: "A player has averaged 18 points per game for 10 games. In game 11, they score 24 points. What is their NEW average?",
+                        answer: "18.5",
+                        hint: "Find old total, add new score, divide by 11"
+                    }
+                ]
+            },
+            baseline: {
+                name: "Baseline",
+                subtitle: "Signed Number Operations",
+                icon: "➕➖",
+                problems: [
+                    {
+                        id: 1,
+                        difficulty: "rookie",
+                        points: 1,
+                        question: "Calculate: -5 + 8",
+                        answer: "3",
+                        hint: "Start at -5, move 8 spaces right"
+                    },
+                    {
+                        id: 2,
+                        difficulty: "rookie",
+                        points: 1,
+                        question: "Calculate: 6 + (-9)",
+                        answer: "-3",
+                        hint: "Start at 6, move 9 spaces left"
+                    },
+                    {
+                        id: 3,
+                        difficulty: "allstar",
+                        points: 2,
+                        question: "A team's point differentials: -7, +4, -2. What is the average?",
+                        answer: "-1.67",
+                        hint: "Sum: -7 + 4 + (-2) = -5, then divide by 3"
+                    },
+                    {
+                        id: 4,
+                        difficulty: "mvp",
+                        points: 3,
+                        question: "A player was -15 below average at halftime, ended +7 above average. What did they score in the second half relative to average?",
+                        answer: "22",
+                        hint: "-15 + second half = +7, so second half = ?"
+                    }
+                ]
+            },
+            halfCourt: {
+                name: "Half Court",
+                subtitle: "Statistics & Data",
+                icon: "📈",
+                problems: [
+                    {
+                        id: 1,
+                        difficulty: "rookie",
+                        points: 1,
+                        question: "Scores: 20, 21, 20, 22, 22. What is the range (max - min)?",
+                        answer: "2",
+                        hint: "Find the highest and lowest values"
+                    },
+                    {
+                        id: 2,
+                        difficulty: "allstar",
+                        points: 2,
+                        question: "Calculate the mean: 50%, 52%, 48%, 51%, 49%",
+                        answer: "50",
+                        hint: "Add all values and divide by 5"
+                    },
+                    {
+                        id: 3,
+                        difficulty: "mvp",
+                        points: 3,
+                        question: "Player A: 50, 52, 48, 51, 49. Player B: 45, 55, 40, 60, 50. Both have mean of 50. Which player is more consistent?",
+                        answer: "A",
+                        hint: "Calculate range for both. Smaller range = more consistent"
+                    }
+                ]
+            }
+        };
+
+        // Initialize Firebase automatically on load
+        function autoInitializeFirebase() {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+                teamsRef = db.ref('teams');
+
+                // Set up connection monitoring
+                const connectedRef = db.ref('.info/connected');
+                connectedRef.on('value', (snap) => {
+                    connected = snap.val() === true;
+                    updateConnectionStatus();
+                });
+
+                // Listen for team updates
+                teamsRef.on('value', (snapshot) => {
+                    updateTeamList();
+                    updateScoreboard();
+                    updateTeacherView();
+                });
+
+                console.log('✅ Connected to Firebase!');
+
+            } catch (error) {
+                console.error('❌ Error connecting to Firebase:', error);
+                alert('Error connecting to Firebase. Please check the console.');
+            }
+        }
+
+        function updateConnectionStatus() {
+            const status = document.getElementById('connectionStatus');
+            if (connected) {
+                status.className = 'connection-status connected';
+                status.innerHTML = '<span class="live-indicator"></span>Connected';
+            } else {
+                status.className = 'connection-status disconnected';
+                status.textContent = '⚠️ Disconnected';
+            }
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            
+            if (screenId === 'game' && currentTeamId) {
+                renderStations();
+                updateScoreboard();
+            } else if (screenId === 'teacherView') {
+                updateTeacherView();
+            } else if (screenId === 'teamSetup') {
+                updateTeamList();
+            }
+        }
+
+        async function createTeam() {
+            const teamName = document.getElementById('newTeamName').value.trim();
+            const studentName = document.getElementById('studentName').value.trim();
+            const grade = document.getElementById('grade').value.trim();
+
+            if (!teamName || !studentName || !grade) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            if (!db) {
+                alert('Firebase not connected!');
+                return;
+            }
+
+            try {
+                const newTeamRef = teamsRef.push();
+                const team = {
+                    name: teamName,
+                    members: [{ name: studentName, grade: grade }],
+                    score: 0,
+                    completedStations: [],
+                    currentStation: null,
+                    createdAt: Date.now()
+                };
+
+                await newTeamRef.set(team);
+                currentTeamId = newTeamRef.key;
+                currentStudentName = studentName;
+
+                // Clear inputs
+                document.getElementById('newTeamName').value = '';
+                document.getElementById('studentName').value = '';
+                document.getElementById('grade').value = '';
+
+                alert(`Team "${teamName}" created! Welcome, ${studentName}!`);
+                updateTeamList();
+
+            } catch (error) {
+                alert('Error creating team: ' + error.message);
+                console.error(error);
+            }
+        }
+
+        async function joinTeam(teamId) {
+            const studentName = prompt('Enter your name:');
+            const grade = prompt('Enter your grade (6, 7, or 8):');
+
+            if (!studentName || !grade) return;
+
+            try {
+                const teamRef = teamsRef.child(teamId);
+                const snapshot = await teamRef.once('value');
+                const team = snapshot.val();
+
+                if (team) {
+                    const members = team.members || [];
+                    members.push({ name: studentName, grade: grade });
+                    await teamRef.update({ members: members });
+
+                    currentTeamId = teamId;
+                    currentStudentName = studentName;
+
+                    alert(`Welcome to ${team.name}, ${studentName}!`);
+                    updateTeamList();
+                }
+            } catch (error) {
+                alert('Error joining team: ' + error.message);
+                console.error(error);
+            }
+        }
+
+        async function updateTeamList() {
+            if (!teamsRef) return;
+
+            try {
+                const snapshot = await teamsRef.once('value');
+                const teams = snapshot.val() || {};
+                const list = document.getElementById('teamList');
+                
+                if (!list) return;
+                
+                list.innerHTML = '';
+
+                Object.keys(teams).forEach(teamId => {
+                    const team = teams[teamId];
+                    const card = document.createElement('div');
+                    card.className = 'team-card';
+                    if (currentTeamId === teamId) {
+                        card.classList.add('selected');
+                    }
+                    card.innerHTML = `
+                        <h3>🏀 ${team.name}</h3>
+                        <div class="members">
+                            ${team.members.map(m => `${m.name} (Grade ${m.grade})`).join('<br>')}
+                        </div>
+                        <p style="margin-top: 10px;">Score: ${team.score || 0} pts</p>
+                    `;
+                    card.onclick = () => joinTeam(teamId);
+                    list.appendChild(card);
+                });
+
+                if (Object.keys(teams).length === 0) {
+                    list.innerHTML = '<p style="text-align: center; color: #718096;">No teams yet. Create the first one!</p>';
+                }
+            } catch (error) {
+                console.error('Error updating team list:', error);
+            }
+        }
+
+        function startTournament() {
+            if (!currentTeamId) {
+                alert('Please join a team first!');
+                return;
+            }
+            showScreen('game');
+        }
+
+        async function renderStations() {
+            const selector = document.getElementById('stationSelector');
+            if (!selector || !currentTeamId) return;
+
+            try {
+                const snapshot = await teamsRef.child(currentTeamId).once('value');
+                const team = snapshot.val();
+                
+                selector.innerHTML = '';
+
+                Object.keys(STATION_DATA).forEach(key => {
+                    const station = STATION_DATA[key];
+                    const btn = document.createElement('div');
+                    btn.className = 'station-btn';
+                    
+                    const completed = team.completedStations && team.completedStations.includes(key);
+                    
+                    if (completed) {
+                        btn.innerHTML = `
+                            <h3>${station.icon} ${station.name}</h3>
+                            <p>${station.subtitle}</p>
+                            <p style="color: #48bb78; font-weight: bold; margin-top: 10px;">✓ Completed</p>
+                        `;
+                    } else {
+                        btn.innerHTML = `
+                            <h3>${station.icon} ${station.name}</h3>
+                            <p>${station.subtitle}</p>
+                        `;
+                        btn.onclick = () => loadStation(key);
+                    }
+                    selector.appendChild(btn);
+                });
+            } catch (error) {
+                console.error('Error rendering stations:', error);
+            }
+        }
+
+        function loadStation(stationKey) {
+            const station = STATION_DATA[stationKey];
+            const content = document.getElementById('stationContent');
+
+            let html = `
+                <div class="card">
+                    <h2>${station.icon} ${station.name}</h2>
+                    <p style="font-size: 1.2em; color: #718096; margin-bottom: 20px;">${station.subtitle}</p>
+                    
+                    <div class="help-box">
+                        💡 <strong>Tip:</strong> Work together as a team! Show your work for full points.
+                    </div>
+            `;
+
+            station.problems.forEach((problem, idx) => {
+                html += `
+                    <div class="problem">
+                        <span class="difficulty-badge ${problem.difficulty}">
+                            ${problem.difficulty.toUpperCase()} - ${problem.points} pt${problem.points > 1 ? 's' : ''}
+                        </span>
+                        <h4>Problem ${idx + 1}</h4>
+                        <p style="font-size: 1.1em; margin: 15px 0;">${problem.question}</p>
+                        
+                        <details style="margin: 10px 0;">
+                            <summary style="cursor: pointer; color: #667eea;">💡 Need a hint?</summary>
+                            <p style="margin-top: 10px; padding: 10px; background: #edf2f7; border-radius: 5px;">
+                                ${problem.hint}
+                            </p>
+                        </details>
+
+                        <input type="text" 
+                               class="answer-input" 
+                               id="answer-${stationKey}-${problem.id}" 
+                               placeholder="Your answer">
+                        
+                        <textarea class="work-shown" 
+                                  id="work-${stationKey}-${problem.id}"
+                                  placeholder="Show your work here (optional but recommended for bonus points!)"></textarea>
+                        
+                        <button class="btn" onclick="checkAnswer('${stationKey}', ${problem.id})">
+                            Submit Answer
+                        </button>
+                        
+                        <div id="feedback-${stationKey}-${problem.id}"></div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    <button class="btn btn-secondary" onclick="completeStation('${stationKey}')" style="margin-top: 20px;">
+                        Finish Station & Choose Next
+                    </button>
+                </div>
+            `;
+
+            content.innerHTML = html;
+        }
+
+        async function checkAnswer(stationKey, problemId) {
+            if (!currentTeamId) return;
+
+            const station = STATION_DATA[stationKey];
+            const problem = station.problems.find(p => p.id === problemId);
+            const userAnswer = document.getElementById(`answer-${stationKey}-${problemId}`).value.trim();
+            const feedback = document.getElementById(`feedback-${stationKey}-${problemId}`);
+            const workShown = document.getElementById(`work-${stationKey}-${problemId}`).value.trim();
+
+            const isCorrect = compareAnswers(userAnswer, problem.answer);
+
+            if (isCorrect) {
+                let points = problem.points;
+                if (workShown.length > 20) {
+                    points += 1;
+                    feedback.className = 'feedback correct';
+                    feedback.innerHTML = `
+                        🎉 Correct! +${points} points (including +1 bonus for showing work!)
+                        <p style="margin-top: 10px; font-size: 0.9em;">Great job explaining your process!</p>
+                    `;
+                } else {
+                    feedback.className = 'feedback correct';
+                    feedback.innerHTML = `✅ Correct! +${points} points`;
+                }
+                
+                try {
+                    const teamRef = teamsRef.child(currentTeamId);
+                    const snapshot = await teamRef.once('value');
+                    const team = snapshot.val();
+                    const newScore = (team.score || 0) + points;
+                    await teamRef.update({ score: newScore });
+                    
+                    document.getElementById(`answer-${stationKey}-${problemId}`).disabled = true;
+                } catch (error) {
+                    console.error('Error updating score:', error);
+                }
+                
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = `
+                    ❌ Not quite right. Try again!
+                    ${workShown.length > 20 ? '<p>Good work showing your process though! Keep it up!</p>' : ''}
+                `;
+            }
+        }
+
+        function compareAnswers(userAnswer, correctAnswer) {
+            const normalize = (str) => str.toLowerCase().replace(/\s+/g, '').replace(/['"]/g, '');
+            const userNorm = normalize(userAnswer);
+            const correctNorm = normalize(correctAnswer);
+
+            if (userNorm === correctNorm) return true;
+
+            try {
+                const userValue = evaluateAnswer(userAnswer);
+                const correctValue = evaluateAnswer(correctAnswer);
+                
+                if (userValue !== null && correctValue !== null) {
+                    return Math.abs(userValue - correctValue) < 0.01;
+                }
+            } catch (e) {}
+
+            if (userNorm.includes('/')) {
+                const parts = userNorm.split('/');
+                if (parts.length === 2) {
+                    const num = parseFloat(parts[0]);
+                    const den = parseFloat(parts[1]);
+                    if (!isNaN(num) && !isNaN(den) && den !== 0) {
+                        const decimalValue = num / den;
+                        const correctValue = evaluateAnswer(correctAnswer);
+                        if (correctValue !== null && Math.abs(decimalValue - correctValue) < 0.01) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        function evaluateAnswer(answer) {
+            const normalized = answer.toLowerCase().replace(/\s+/g, '');
+            
+            if (normalized.includes('/')) {
+                const parts = normalized.split('/');
+                if (parts.length === 2) {
+                    const num = parseFloat(parts[0].replace(/[()]/g, ''));
+                    const den = parseFloat(parts[1].replace(/[()]/g, ''));
+                    if (!isNaN(num) && !isNaN(den) && den !== 0) {
+                        return num / den;
+                    }
+                }
+            }
+            
+            const num = parseFloat(normalized.replace(/[()]/g, ''));
+            if (!isNaN(num)) {
+                return num;
+            }
+            
+            return null;
+        }
+
+        async function completeStation(stationKey) {
+            if (!currentTeamId) return;
+
+            try {
+                const teamRef = teamsRef.child(currentTeamId);
+                const snapshot = await teamRef.once('value');
+                const team = snapshot.val();
+                const completedStations = team.completedStations || [];
+                
+                if (!completedStations.includes(stationKey)) {
+                    completedStations.push(stationKey);
+                    const newScore = (team.score || 0) + 5;
+                    await teamRef.update({ 
+                        completedStations: completedStations,
+                        score: newScore,
+                        currentStation: null
+                    });
+                    
+                    alert('🎊 Station complete! +5 bonus points!');
+                }
+                
+                if (completedStations.length === Object.keys(STATION_DATA).length) {
+                    endTournament();
+                } else {
+                    renderStations();
+                    document.getElementById('stationContent').innerHTML = '';
+                }
+            } catch (error) {
+                console.error('Error completing station:', error);
+            }
+        }
+
+        async function updateScoreboard() {
+            if (!teamsRef) return;
+
+            try {
+                const snapshot = await teamsRef.once('value');
+                const teams = snapshot.val() || {};
+                const content = document.getElementById('scoreboardContent');
+                
+                if (!content) return;
+
+                const sortedTeams = Object.keys(teams)
+                    .map(id => ({ id, ...teams[id] }))
+                    .sort((a, b) => (b.score || 0) - (a.score || 0));
+                
+                content.innerHTML = sortedTeams.map((team, idx) => `
+                    <div class="score-item">
+                        <span>${idx + 1}. ${team.name} ${team.id === currentTeamId ? '(Your Team)' : ''}</span>
+                        <span>${team.score || 0} pts</span>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error updating scoreboard:', error);
+            }
+        }
+
+        function endTournament() {
+            showScreen('results');
+            updateFinalResults();
+        }
+
+        async function updateFinalResults() {
+            if (!teamsRef) return;
+
+            try {
+                const snapshot = await teamsRef.once('value');
+                const teams = snapshot.val() || {};
+                const results = document.getElementById('finalResults');
+                
+                const sortedTeams = Object.keys(teams)
+                    .map(id => ({ id, ...teams[id] }))
+                    .sort((a, b) => (b.score || 0) - (a.score || 0));
+                
+                results.innerHTML = `
+                    <h2 style="margin: 30px 0;">Final Standings</h2>
+                    ${sortedTeams.map((team, idx) => `
+                        <div class="score-item" style="font-size: 1.2em; margin: 15px 0;">
+                            <span>
+                                ${idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : ''}
+                                ${idx + 1}. ${team.name}
+                            </span>
+                            <span style="font-weight: bold;">${team.score || 0} points</span>
+                        </div>
+                    `).join('')}
+                `;
+            } catch (error) {
+                console.error('Error updating final results:', error);
+            }
+        }
+
+        async function updateTeacherView() {
+            if (!teamsRef) return;
+
+            try {
+                const snapshot = await teamsRef.once('value');
+                const teams = snapshot.val() || {};
+                const stats = document.getElementById('teacherStats');
+                const teamList = document.getElementById('teacherTeamList');
+                
+                if (!stats || !teamList) return;
+
+                const teamArray = Object.keys(teams).map(id => ({ id, ...teams[id] }));
+                const totalStudents = teamArray.reduce((sum, team) => sum + (team.members?.length || 0), 0);
+                const avgScore = teamArray.length > 0 
+                    ? (teamArray.reduce((sum, team) => sum + (team.score || 0), 0) / teamArray.length).toFixed(1)
+                    : 0;
+                
+                stats.innerHTML = `
+                    <div class="stat-card">
+                        <div class="value">${teamArray.length}</div>
+                        <div class="label">Teams</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value">${totalStudents}</div>
+                        <div class="label">Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value">${avgScore}</div>
+                        <div class="label">Avg Score</div>
+                    </div>
+                `;
+                
+                teamList.innerHTML = `
+                    <h3 style="margin: 20px 0;">All Teams</h3>
+                    ${teamArray.map(team => `
+                        <div class="card" style="margin: 10px 0; padding: 15px;">
+                            <h4>${team.name} - ${team.score || 0} points</h4>
+                            <p>Members: ${team.members?.map(m => `${m.name} (${m.grade})`).join(', ') || 'None'}</p>
+                            <p>Completed: ${team.completedStations?.length || 0}/${Object.keys(STATION_DATA).length} stations</p>
+                        </div>
+                    `).join('')}
+                `;
+            } catch (error) {
+                console.error('Error updating teacher view:', error);
+            }
+        }
+
+        async function resetTournament() {
+            if (!confirm('Are you sure you want to reset the entire tournament? This will delete all teams and scores.')) {
+                return;
+            }
+
+            try {
+                await teamsRef.remove();
+                currentTeamId = null;
+                currentStudentName = null;
+                alert('Tournament has been reset successfully!');
+                showScreen('welcome');
+            } catch (error) {
+                alert('Error resetting tournament: ' + error.message);
+                console.error(error);
+            }
+        }
+
+        function resetForNewRound() {
+            currentTeamId = null;
+            currentStudentName = null;
+            showScreen('welcome');
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            autoInitializeFirebase();
+        };
+    </script>
+</body>
+</html>
